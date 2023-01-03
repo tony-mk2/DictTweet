@@ -35,7 +35,7 @@
             })
                 .then(response => response.json())
                 .then(json => {
-                    document.getElementById("content").innerText = json.content;
+                    document.getElementById("content").innerText = htmlscd(json.content);
                     url = encodeURI(json.url);
                 })
         }
@@ -50,6 +50,24 @@
                 buttonClick();
             }
         });
+        let htmlscd = (function () {
+            const re = /&#x([0-9A-Fa-f]+);|&#(\d+);|&\w+;/g;
+            const map = { '&nbsp;': ' ', '&lt;': '<', '&gt;': '>', '&amp;': '&', '&quot;': '"', '&apos;': "'", '&copy;': '©' };
+            return function (text) {
+                return text.replace(re, function (match, p1, p2) {
+                    if (match.charAt(1) == '#') {
+                        if (match.charAt(2) == 'x') {
+                            return String.fromCharCode(parseInt(p1, 16));
+                        } else {
+                            return String.fromCharCode(p2 - 0);
+                        }
+                    } else if (map.hasOwnProperty(match)) {
+                        return map[match];
+                    }
+                    return match;
+                });
+            };
+        })();
     </script>
 </body>
 
